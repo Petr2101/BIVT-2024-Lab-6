@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Task_3
+namespace Lab_6
 {
     public class Green_3
     {
