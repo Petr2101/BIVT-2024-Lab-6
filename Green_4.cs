@@ -16,7 +16,7 @@ namespace Lab_6
             private int _attempts;
             public string Name => _name;
             public string Surname => _surname;
-            public double[] Jumps => _jumps != null ? (double[])_jumps.Clone() : new double[3];
+            public double[] Jumps => _jumps?.Clone() as double[]; 
             public double BestJump
             {
                 get
@@ -34,12 +34,13 @@ namespace Lab_6
             public Participant(string name, string surname)
             {
                 _name = name ?? string.Empty;
-                _surname = surname ?? string.Empty; 
+                _surname = surname ?? string.Empty;
                 _jumps = new double[3]; 
                 _attempts = 0;
             }
             public void Jump(double result)
             {
+                if (_jumps == null) return; 
                 if (_attempts < 3 && result >= 0)
                 {
                     _jumps[_attempts] = result;

@@ -16,10 +16,10 @@ namespace Lab_6
 
             public string Name => _name;
             public string Surname => _surname;
-            public int[] Marks => _marks.ToArray(); 
+            public int[] Marks => _marks?.ToArray() ?? new int[0];
 
-            public double AvgMark => _marks.Length > 0 ? (double)_marks.Sum() / _marks.Length : 0;
-            public bool IsExcellent => _marks.Length > 0 && _marks.All(mark => mark >= 4); 
+            public double AvgMark => _marks != null && _marks.Length > 0 ? _marks.Average() : 0;
+            public bool IsExcellent => _marks != null && _marks.Length > 0 && _marks.All(mark => mark >= 4);
 
             public Student(string name, string surname)
             {
@@ -34,7 +34,7 @@ namespace Lab_6
 
                 for (int i = 0; i < _marks.Length; i++)
                 {
-                    if (_marks[i] == 0) 
+                    if (_marks[i] == 0)
                     {
                         _marks[i] = mark;
                         break;
