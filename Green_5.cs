@@ -10,142 +10,160 @@ namespace Lab_6
     {
         public struct Student
         {
-            private string firstName;
-            private string lastName;
-            private int[] subjectScores;
-            public string Name => firstName;
-            public string Surname => lastName;
-            public int[] Marks => subjectScores != null ? (int[])subjectScores.Clone() : null;
-            public Student(string name, string surname)
+            private string _name;
+            private string _surname;
+            private int[] _marks;
+            public string Name => _name;
+            public string Surname => _surname;
+            public int[] Marks
             {
-                firstName = name;
-                lastName = surname;
-                subjectScores = new int[5];
-                Array.Clear(subjectScores, 0, subjectScores.Length); 
+                get
+                {
+                    if (_marks == null)
+                    {
+                        return null;
+                    }
+                    int[] array = new int[_marks.Length];
+                    Array.Copy(_marks, array, _marks.Length);
+                    return array;
+                }    
             }
             public double AvgMark
             {
                 get
                 {
-                    if (subjectScores == null || subjectScores.Length == 0)
+                    if (_marks == null || _marks.Length == 0)
+                    {
                         return 0;
-                    double total = 0;
-                    int count = 0;
-                    foreach (int score in subjectScores)
-                    {
-                        if (score != 0)
-                        {
-                            total += score;
-                            count++;
-                        }
                     }
-                    return count > 0 ? total / count : 0;
+                    double summ = 0;
+                    for (int i = 0; i < _marks.Length; i++)
+                    {
+                        summ += _marks[i];
+                    }
+                    return summ / _marks.Length;
                 }
             }
-            public void SetExamScore(int mark)
+            public Student(string name, string surname)
             {
-                if (subjectScores == null || mark < 2 || mark > 5)
-                    return;
-                for (int i = 0; i < subjectScores.Length; i++)
+                _name = name;
+                _surname = surname;
+                _marks = new int[5];
+            }
+            public void Exam(int mark)
+            {
+                if (_marks == null)
                 {
-                    if (subjectScores[i] == 0)
+                    return;
+                }
+                if (mark < 2 || mark > 5)
+                {
+                    return;
+                }
+                for (int i = 0; i < _marks.Length; i++)
+                {
+                    if (_marks[i] == 0)
                     {
-                        subjectScores[i] = mark;
-                        return;
+                        _marks[i] = mark;
+                        break;
                     }
                 }
             }
-            public void ShowDetails()
+            public void Print()
             {
-                string scoresText = Marks != null ? string.Join(", ", Marks) : "No scores";
-                Console.WriteLine($"{Name,-12} {Surname,-12} {AvgMark,-12:F2} {scoresText}");
+                Console.WriteLine($"{Name} {Surname}");
+                Console.WriteLine($"Средний балл: {AvgMark:F2}");
             }
         }
         public struct Group
         {
-            private string groupTitle;
-            private Student[] enrolledStudents;
-            private int enrolledCount;
-
-            public string Name => groupTitle;
-            public Student[] Students => enrolledStudents;
-
-            public Group(string title)
-            {
-                groupTitle = title;
-                enrolledStudents = new Student[0];
-                enrolledCount = 0;
-            }
+            private string _name;
+            private Student[] _students;
+            private int _count;
+            public string Name => _name;
+            public Student[] Students => _students;
             public double AvgMark
             {
                 get
                 {
-                    if (enrolledStudents == null || enrolledCount == 0)
+                    if (_students == null || _count == 0)
+                    {
                         return 0;
+                    }
+                    int val = 0;
+                    double avg = 0;
 
-                    double sum = 0;
-                    int markCount = 0;
-                    for (int i = 0; i < enrolledCount; i++)
+                    for (int i = 0; i < _count; i++)
                     {
-                        int[] studentMarks = enrolledStudents[i].Marks;
-                        if (studentMarks != null)
+                        if (_students[i].AvgMark > 0)
                         {
-                            foreach (int mark in studentMarks)
-                            {
-                                if (mark != 0)
-                                {
-                                    sum += mark;
-                                    markCount++;
-                                }
-                            }
+                            avg += _students[i].AvgMark;
+                            val++;
                         }
                     }
-                    return markCount > 0 ? sum / markCount : 0;
+                    return val == 0 ? 0 : avg / val;
                 }
             }
-            public void EnrollStudent(Student student)
+            public Group(string name)
             {
-                if (enrolledStudents == null)
-                    enrolledStudents = new Student[0];
-
-                Array.Resize(ref enrolledStudents, enrolledCount + 1);
-                enrolledStudents[enrolledCount] = student;
-                enrolledCount++;
+                _name = name;
+                _students = new Student[0];
+                _count = 0;
             }
-            public void EnrollMultipleStudents(Student[] students)
+            public void Add(Student student)
             {
-                if (students == null || students.Length == 0)
-                    return;
-
-                if (enrolledStudents == null)
-                    enrolledStudents = new Student[0];
-
-                int newSize = enrolledCount + students.Length;
-                Array.Resize(ref enrolledStudents, newSize);
-                Array.Copy(students, 0, enrolledStudents, enrolledCount, students.Length);
-                enrolledCount = newSize;
+                if (_students == null)
+                    _students = new Student[0];
+                Array.Resize(ref _students, _count + 1);
+                _students[_count] = student;
+                _count++;
             }
-            public static void OrderByAverageScore(Group[] groups)
+            public void Add(Student[] Students)
             {
-                if (groups == null || groups.Length <= 1)
-                    return;
-
-                for (int i = 0; i < groups.Length - 1; i++)
+                if (Students == null)
                 {
-                    for (int j = 0; j < groups.Length - i - 1; j++)
-                    {
-                        if (groups[j].AvgMark < groups[j + 1].AvgMark)
-                        {
-                            Group temp = groups[j];
-                            groups[j] = groups[j + 1];
-                            groups[j + 1] = temp;
-                        }
-                    }
+                    return;
+                }
+                if (_students == null)
+                {
+                    _students = new Student[0];
+                }
+                int len = _count + Students.Length;
+                Array.Resize(ref _students, len);
+                for (int i = 0; i < Students.Length; i++)
+                {
+                    _students[_count + i] = Students[i];
+                }
+                _count = len;
+            }
+            public void Print()
+            {
+                Console.WriteLine($"Группа: {Name} | Средний балл: {AvgMark:F2}");
+
+                foreach (var st in _students)
+                {
+                    st.Print();
                 }
             }
-            public void DisplayGroupInfo()
+            public static void SortByAvgMark(Group[] array)
             {
-                Console.WriteLine($"{Name,-12} {AvgMark,-15:F2}");
+                if (array == null || array.Length == 0)
+                    return;
+                bool swapped;
+                do
+                {
+                    swapped = false;
+                    for (int i = 0; i < array.Length - 1; i++)
+                    {
+                        if (array[i].AvgMark < array[i + 1].AvgMark)
+                        {
+                            Group vre = array[i];
+                            array[i] = array[i + 1];
+                            array[i + 1] = vre;
+                            swapped = true;
+                        }
+                    }
+                } while (swapped);
             }
         }
     }
